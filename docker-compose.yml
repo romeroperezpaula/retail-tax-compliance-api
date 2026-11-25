@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tax-postgres
+    environment:
+      POSTGRES_DB: taxdb
+      POSTGRES_USER: taxuser
+      POSTGRES_PASSWORD: taxpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taxuser -d taxdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  tax-api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: tax-compliance-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: taxdb
+      DB_USER: taxuser
+      DB_PASSWORD: taxpass
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
