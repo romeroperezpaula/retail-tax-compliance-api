@@ -1,0 +1,38 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tax-compliance-api-monitor
+  namespace: monitoring
+  labels:
+    release: prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - tax-app
+  selector:
+    matchLabels:
+      app: tax-compliance-api
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: tax-compliance-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus-stack
+spec:
+  groups:
+    - name: tax-compliance.rules
+      rules:
+        - alert: TaxComplianceApiDown
+          expr: up{job="tax-compliance-service"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "La API Retail Tax & Compliance está caída"
+            description: "Uno o más pods de tax-compliance-service llevan más de 1 minuto sin responder."
