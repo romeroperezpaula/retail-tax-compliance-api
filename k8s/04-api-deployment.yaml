@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: tax-compliance-api
-          image: romeroperezpaula/tax-compliance-service:1.0.0
+          image: romeroperezpaula/tax-compliance-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

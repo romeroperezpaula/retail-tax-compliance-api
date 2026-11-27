@@ -31,3 +31,6 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+API_ADMIN_USER: ${API_ADMIN_USER:admin}
+API_ADMIN_PASSWORD: ${API_ADMIN_PASSWORD:changeme123}
