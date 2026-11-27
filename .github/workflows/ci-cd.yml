@@ -20,20 +20,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Configure Google Maven Central Mirror
-        uses: s4u/maven-settings-action@v3
-        with:
-          mirrors: |
-            [{
-              "id": "google-maven-central",
-              "name": "GCS Maven Central mirror",
-              "url": "https://maven-central.storage-download.googleapis.com/maven2",
-              "mirrorOf": "central"
-            }]
-
-      - name: Run unit tests with Maven
+      - name: Configure Maven mirror and run tests
         working-directory: ./app
-        run: mvn test -B
+        run: |
+          mkdir -p ~/.m2
+          printf '<settings><mirrors><mirror><id>google</id><url>https://maven-central.storage-download.googleapis.com/maven2</url><mirrorOf>central</mirrorOf></mirror></mirrors></settings>' > ~/.m2/settings.xml
+          mvn test -B
 
       - name: Log in to DockerHub
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
